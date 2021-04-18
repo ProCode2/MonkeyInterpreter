@@ -2,9 +2,15 @@ use crate::token::{lookup_ident, TokenType};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Token {
-  token_type: &'static TokenType,
-  literal: String,
+  pub token_type: &'static TokenType,
+  pub literal: String,
 }
+
+// impl PartialEq<TokenType> for Token {
+//   fn eq(&self, other: &TokenType) -> bool {
+//     self.token_type == other
+//   }
+// }
 
 pub struct Lexer {
   input: String,
@@ -44,7 +50,7 @@ impl Lexer {
     self.read_position += 1;
   }
 
-  fn new_token(token_type: &'static TokenType, ch: char) -> Token {
+  pub fn new_token(token_type: &'static TokenType, ch: char) -> Token {
     Token {
       token_type: token_type,
       literal: ch.to_string(),

@@ -1,3 +1,4 @@
+use crate::lexer::Token;
 use std::collections::HashMap;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -36,6 +37,12 @@ pub enum TokenType {
   EQ,
   NOTEQ,
 }
+
+// impl PartialEq<Token> for TokenType {
+//   fn eq(&self, other: &Token) -> bool {
+//     self == other.token_type
+//   }
+// }
 
 fn get_keywords() -> HashMap<String, &'static TokenType> {
   let mut keywords: HashMap<String, &TokenType> = HashMap::new();
