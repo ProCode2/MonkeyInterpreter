@@ -1,4 +1,3 @@
-use crate::lexer::Token;
 use std::collections::HashMap;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -36,6 +35,10 @@ pub enum TokenType {
   RETURN,
   EQ,
   NOTEQ,
+}
+
+pub enum Statement {
+  LetStatement,
 }
 
 // impl PartialEq<Token> for TokenType {

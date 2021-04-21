@@ -12,6 +12,7 @@ pub struct Token {
 //   }
 // }
 
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Lexer {
   input: String,
   position: usize,
