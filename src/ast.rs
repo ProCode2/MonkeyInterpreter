@@ -5,6 +5,7 @@ use crate::lexer::Token;
 pub enum Statement {
   LetStatement(LetStatement),
   ReturnStatement(ReturnStatement),
+  ExpressionStatement(ExpressionStatement),
   NilStatement,
 }
 
@@ -19,8 +20,35 @@ impl Statement {
     match self {
       Statement::LetStatement(ls) => ls.token.literal.clone(),
       Statement::ReturnStatement(rs) => rs.token.literal.clone(),
+      Statement::ExpressionStatement(es) => es.token.literal.clone(),
       _ => "".to_string(),
     }
+  }
+
+  fn string(&self) -> String {
+    let mut statement = String::from("");
+    match self {
+      Statement::LetStatement(ls) => {
+        statement.push_str(&format!(
+          "{} {} = {};",
+          &ls.token.literal,
+          ls.name.string(),
+          ls.value.string()
+        ));
+      }
+      Statement::ReturnStatement(rs) => {
+        statement.push_str(&format!(
+          "{} {};",
+          &rs.token.literal,
+          &rs.expression_value.string()
+        ));
+      }
+      Statement::ExpressionStatement(es) => {
+        statement.push_str(&format!("{}", &es.expression.string(),));
+      }
+      Statement::NilStatement => statement.push_str(""),
+    }
+    statement
   }
 }
 
@@ -30,6 +58,15 @@ impl Expression {
       Expression::Identifier(id) => id.token.literal.clone(),
       _ => "".to_string(),
     }
+  }
+
+  fn string(&self) -> String {
+    let mut statement = String::from("");
+    match self {
+      Expression::Identifier(i) => statement.push_str(&i.value),
+      Expression::NilExpression => statement.push_str(""),
+    }
+    statement
   }
 }
 
@@ -48,6 +85,13 @@ impl Program {
     } else {
       "".to_string()
     }
+  }
+  pub fn string(&self) -> String {
+    let mut statements = String::from("");
+    for statement in &self.statements {
+      statements.push_str(&format!("{}\n", &statement.string()))
+    }
+    statements
   }
 }
 
@@ -68,4 +112,10 @@ pub struct ReturnStatement {
 pub struct Identifier {
   pub token: Token,
   pub value: String,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone)]
+pub struct ExpressionStatement {
+  pub token: Token,
+  pub expression: Expression,
 }

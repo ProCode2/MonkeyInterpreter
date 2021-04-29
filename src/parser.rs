@@ -1,6 +1,7 @@
 use crate::ast::*;
 use crate::lexer::{Lexer, Token};
 use crate::token::TokenType;
+use std::collections::HashMap;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Parser {
@@ -120,3 +121,5 @@ impl Parser {
     }
   }
 }
+
+type parse_fn = fn() -> ast::Expression
