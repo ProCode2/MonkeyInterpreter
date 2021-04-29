@@ -15,5 +15,5 @@ fn main() {
     let l = lexer::Lexer::new(input);
     let mut p = parser::Parser::new(l);
     let program = p.parse_program();
-    println!("{:?}", program.statements);
+    println!("{:#?}", program.statements);
 }
