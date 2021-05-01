@@ -3,12 +3,26 @@ use crate::lexer::{Lexer, Token};
 use crate::token::TokenType;
 use std::collections::HashMap;
 
+type PrefixParseFn = fn() -> Expression;
+type InfixParseFn = fn(Expression) -> Expression;
+
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Parser {
   l: Lexer,
   cur_token: Token,
   peek_token: Token,
+  prefix_parse_fns: HashMap<TokenType, PrefixParseFn>,
+  infix_parse_fns: HashMap<TokenType, InfixParseFn>,
   errors: Vec<String>,
+}
+
+pub enum Precedence {
+  LOWEST,
+  EQUALS,  // == LESSGREATER // > or <
+  SUM,     // +
+  PRODUCT, // *
+  PREFIX,  // -X or !X
+  CALL,    // myFunction(X)
 }
 
 impl Parser {
@@ -17,6 +31,8 @@ impl Parser {
       l: l,
       cur_token: Lexer::new_token(&TokenType::EOF, '\0'),
       peek_token: Lexer::new_token(&TokenType::EOF, '\0'),
+      infix_parse_fns: HashMap::new(),
+      prefix_parse_fns: HashMap::new(),
       errors: Vec::new(),
     };
     p.next_token();
@@ -26,6 +42,14 @@ impl Parser {
 
   pub fn errors(&self) -> Vec<String> {
     self.errors.clone()
+  }
+
+  pub fn register_prefix(&mut self, t: TokenType, func: PrefixParseFn) {
+    self.prefix_parse_fns.insert(t, func);
+  }
+
+  pub fn register_infix(&mut self, t: TokenType, func: InfixParseFn) {
+    self.infix_parse_fns.insert(t, func);
   }
 
   pub fn peek_error(&mut self, t: &TokenType) {
@@ -56,8 +80,17 @@ impl Parser {
     match self.cur_token.token_type {
       &TokenType::LET => self.parse_let_statement(),
       &TokenType::RETURN => self.parse_return_statement(),
-      _ => Statement::NilStatement,
+      _ => self.parse_expression_statement(),
     }
+  }
+
+  pub fn parse_expression(&self, precedence: Precedence) -> Expression {
+    let prefix = self
+      .prefix_parse_fns
+      .get(&self.cur_token.token_type)
+      .expect("failed to parse");
+    let leftExpression = prefix();
+    return leftExpression;
   }
 
   pub fn parse_return_statement(&mut self) -> Statement {
@@ -121,5 +154,3 @@ impl Parser {
     }
   }
 }
-
-type parse_fn = fn() -> ast::Expression
